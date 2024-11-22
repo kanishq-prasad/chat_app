@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Welcome to Flask Chat</h1>
+    <div class="form-container">
+        <input type="text" id="username" placeholder="Enter your username" required>
+        <input type="text" id="roomID_Name" placeholder="Enter room ID/Name" required>
+        <button onclick="createRoom()">Create Room</button>
+        <button onclick="joinRoom()">Join Room</button>
+    </div>
+</div>
+{% endblock %}

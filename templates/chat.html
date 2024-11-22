@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>Room: {{ room_name }}</h2>
+        <span>Logged in as: {{ username }}</span>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+        <input type="text" id="messageInput" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+<script>
+    const ROOM_ID = "{{ room_id }}";
+    const USERNAME = "{{ username }}";
+    // the variables ROOM_CODE and USERNAME are declared in the <script>
+    // tag within the HTML template. They get their values from the
+    // server-side template rendering engine, which in this case appears
+    // to be Jinja2 (commonly used with Flask)
+</script>
+{% endblock %}
