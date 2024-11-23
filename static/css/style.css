@@ -99,3 +99,9 @@ button:hover {
 .message-content {
     word-break: break-word;
 }
+
+.active-users {
+    margin-top: 0;
+    font-size: 1.2em;
+    color: #333;
+}

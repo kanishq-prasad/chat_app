@@ -5,8 +5,8 @@ from repositories.room_repository import RoomRepository
 
 class Rooms(Resource):
     def join(self, data):
-        room_id = data.get('roomID')
-        username = data.get('username')
+        room_id = data['roomID']
+        username = data['username']
         
         existing_room = RoomRepository().check_room_exists(room_id)
         if not existing_room:
@@ -15,7 +15,7 @@ class Rooms(Resource):
         session['username'] = username
         session['room_id'] = room_id
         session['messages'] = []
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'room_id': room_id})
 
     def get(self, room_id):
         room_name = RoomRepository().get_room_name_by_id(room_id)

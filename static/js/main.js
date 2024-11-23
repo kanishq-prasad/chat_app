@@ -6,14 +6,13 @@ if (window.location.pathname.includes('/chat/')) {
     
     socket.on('connect', () => { // the connect event in the frontend is a built-in event provided by the Socket.IO library. when the client connects to the server, this event is triggered automatically
         socket.emit('join', {
-            room_id: ROOM_ID,
+            room: ROOM_ID,
             username: USERNAME
         }); // the value of ROOM_ID and USERNAME are embeded in chat.html
         fetchMessages(ROOM_ID);
     });
     
     socket.on('message', (data) => {
-        console.log('Message received:', data.message);
         appendMessage(data.username, data.message);
     });
     
@@ -21,10 +20,14 @@ if (window.location.pathname.includes('/chat/')) {
         appendStatusMessage(data.msg);
     });
     
+    socket.on('active_users', (data) => {
+        updateActiveUsers(data.users);
+    });
+    
     // Handle page unload
     window.addEventListener('beforeunload', () => {
         socket.emit('leave', {
-            room_id: ROOM_ID,
+            room: ROOM_ID,
             username: USERNAME
         });
     });
@@ -32,7 +35,7 @@ if (window.location.pathname.includes('/chat/')) {
     // Handle page reload
     window.addEventListener('unload', () => {
         socket.emit('leave', {
-            room_id: ROOM_ID,
+            room: ROOM_ID,
             username: USERNAME
         });
     });
@@ -109,7 +112,7 @@ function joinRoom() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = `/chat/${roomID}`;
+            window.location.href = `/chat/${data.room_id}`;
         } else {
             alert(data.message);
         }
@@ -129,6 +132,15 @@ function sendMessage() {
     });
     
     messageInput.value = '';
+}
+
+function leaveRoom() {
+    socket.emit('leave', {
+        room: ROOM_ID,
+        username: USERNAME
+    });
+
+    window.location.href = '/';
 }
 
 function appendMessage(username, message, timestamp) {
@@ -159,21 +171,19 @@ function appendStatusMessage(message) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-socket.on('active_users', (data) => {
-    updateActiveUsers(data.users);
-});
-
 function updateActiveUsers(users) {
     const userList = document.getElementById('activeUsers');
     if (userList) {
         userList.innerHTML = '';
-        users.forEach(user => {
-            const userElement = document.createElement('div');
-            userElement.className = 'active-user';
-            userElement.textContent = user;
-            userList.appendChild(userElement);
-        });
     }
+    users.forEach(user => {
+        const userElement = document.createElement('div');
+        userElement.className = 'active-user';
+        userElement.textContent = user;
+        userList.appendChild(userElement);
+        console.log("user: ", user);
+    });
+    console.log("users: ", users);
 }
 
 // fetch the last 50 messages from the server
