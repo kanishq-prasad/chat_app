@@ -1,6 +1,7 @@
 Flask
 Flask-SocketIO
 Flask-RESTful
+Flask-SQLAlchemy
 PyJWT
 Werkzeug
 SQLAlchemy
