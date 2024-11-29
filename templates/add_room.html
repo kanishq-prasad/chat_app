@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Welcome to ChatApp</h1>
+    <div class="form-container">
+        <input type="text" id="roomID_Name" placeholder="Enter room ID/Name" required>
+        <button onclick="createRoom( '{{user_id}}' )">Create Room</button>
+        <button onclick="joinRoom( '{{user_id}}' )">Join Room</button>
+    </div>
+</div>
+{% endblock %}

@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    <h1>Welcome to ChatApp</h1>
-    <div class="form-container">
-        <input type="text" id="username" placeholder="Enter your username" required>
-        <input type="text" id="roomID_Name" placeholder="Enter room ID/Name" required>
-        <button onclick="createRoom()">Create Room</button>
-        <button onclick="joinRoom()">Join Room</button>
+    <div class="auth-container">
+        <div class="login-form">
+            <h2>Login</h2>
+            <input type="text" id="username_l" placeholder="Username" required>
+            <input type="password" id="password_l" placeholder="Password" required>
+            <button onclick="login()">Login</button>
+        </div>
+        
+        <div class="register-form">
+            <h2>Register</h2>
+            <input type="text" id="username_r" placeholder="Username" required>
+            <!-- <input type="email" id="email" placeholder="Email" required> -->
+            <input type="password" id="password_r" placeholder="Password" required>
+            <button onclick="register()">Register</button>
+        </div>
     </div>
 </div>
 {% endblock %}

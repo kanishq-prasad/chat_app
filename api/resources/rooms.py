@@ -6,13 +6,13 @@ from repositories.room_repository import RoomRepository
 class Rooms(Resource):
     def join(self, data):
         room_id = data['roomID']
-        username = data['username']
+        user_id = data['user_id']
         
         existing_room = RoomRepository().check_room_exists(room_id)
         if not existing_room:
             return jsonify({'success': False, 'message': 'Room not found'})
         
-        session['username'] = username
+        session['user_id'] = user_id
         session['room_id'] = room_id
         session['messages'] = []
         return jsonify({'success': True, 'room_id': room_id})
@@ -25,11 +25,11 @@ class Rooms(Resource):
     
     def post(self, data):
         room_name = data.get('roomName')
-        username = data.get('username')
+        user_id = data.get('user_id')
 
         room_id = RoomRepository().create_room(room_name)
         
-        session['username'] = username
+        session['user_id'] = user_id
         session['room_id'] = room_id
         if not room_id:
             return jsonify({'success': False, 'message': 'Error creating room'})

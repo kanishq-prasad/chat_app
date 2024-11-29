@@ -29,15 +29,27 @@ class RoomRepository(BaseRepository, Rooms):
         try:
             with safe_session() as session:
                 room = session.query(Rooms).filter(Rooms.id == room_id).first()
-                return room.room_name
+                room = room.to_dict()
+                return room['room_name']
         except Exception as e:
             logger.error("Error in getting room by id: %s", e)
+            return False
+    
+    def get_rooms_by_ids(self, room_ids):
+        try:
+            with safe_session() as session:
+                room_details = session.query(Rooms).filter(Rooms.id.in_(room_ids)).all()
+                room_details = [room.to_dict() for room in room_details]
+                return room_details
+        except Exception as e:
+            logger.error("Error in getting message details by ids: %s", e)
             return False
         
     def check_room_exists(self, room_id):
         try:
             with safe_session() as session:
                 room = session.query(Rooms).filter(Rooms.id == room_id).first()
+                room = room.to_dict()
                 return room
         except Exception as e:
             logger.error("Error in checking room exists: %s", e)

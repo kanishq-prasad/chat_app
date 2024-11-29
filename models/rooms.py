@@ -12,7 +12,7 @@ class Rooms(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'room_code': self.room_code,
+            'room_name': self.room_name,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'last_activity': self.last_activity.strftime('%Y-%m-%d %H:%M:%S')
         }

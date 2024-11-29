@@ -7,7 +7,7 @@ if (window.location.pathname.includes('/chat/')) {
     socket.on('connect', () => { // the connect event in the frontend is a built-in event provided by the Socket.IO library. when the client connects to the server, this event is triggered automatically
         socket.emit('join', {
             room: ROOM_ID,
-            username: USERNAME
+            user_id: USER_ID
         }); // the value of ROOM_ID and USERNAME are embeded in chat.html
         fetchMessages(ROOM_ID);
     });
@@ -28,7 +28,7 @@ if (window.location.pathname.includes('/chat/')) {
     window.addEventListener('beforeunload', () => {
         socket.emit('leave', {
             room: ROOM_ID,
-            username: USERNAME
+            user_id: USER_ID
         });
     });
 
@@ -36,7 +36,7 @@ if (window.location.pathname.includes('/chat/')) {
     window.addEventListener('unload', () => {
         socket.emit('leave', {
             room: ROOM_ID,
-            username: USERNAME
+            user_id: USER_ID
         });
     });
 
@@ -61,11 +61,122 @@ if (window.location.pathname.includes('/chat/')) {
     });
 }
 
-function createRoom() {
-    const username = document.getElementById('username').value;
+function sendAuthenticatedRequest(route, method = 'GET') {
+    const token = localStorage.getItem('token');
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+
+    return fetch(route, {
+        method: method,
+        headers: headers
+    })
+    .then(response => response.json())
+    .catch(error => {
+        console.error('Error:', error);
+        throw error; // Re-throw the error to be handled by the caller
+    });
+}
+
+function register() {
+    const username = document.getElementById('username_r').value;
+    // const email = document.getElementById('email').value;
+    const password = document.getElementById('password_r').value;
+
+    console.log("username: ", username);
+    console.log("password: ", password);
+    
+    fetch('/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Store token in localStorage
+            localStorage.setItem('token', data.token);
+            window.location.href = `/rooms/${data.user_id}`;
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+function login() {
+    const username = document.getElementById('username_l').value;
+    const password = document.getElementById('password_l').value;
+    
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Store token in localStorage
+            localStorage.setItem('token', data.token);
+            window.location.href = `/rooms/${data.user_id}`;
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+function setupAxiosInterceptors() {
+    // Add token to all HTTP requests
+    axios.interceptors.request.use(
+        config => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+            return config;
+        },
+        error => Promise.reject(error)
+    );
+}
+
+function openRoom(roomID) {
+    
+    if (!roomID) {
+        alert('Invalid room code');
+        return;
+    }
+    
+    window.location.href = `/chat/${roomID}`;
+}
+
+function addRoom(userID){
+
+    console.log("userID: ", userID);
+
+    if (!userID) {
+        alert('No user ID found');
+        return;
+    }
+    
+    window.location.href = `/add-room/${userID}`;
+
+}
+
+function createRoom(userID) {
+    // const username = document.getElementById('username').value;
     const roomID_Name = document.getElementById('roomID_Name').value;
     
-    if (!username || !roomID_Name) {
+    if (!userID || !roomID_Name) {
         alert('Please enter both username and room code');
         return;
     }
@@ -76,13 +187,14 @@ function createRoom() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            username: username,
+            user_id: userID,
             roomName: roomID_Name
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // console.log("data.room_id: ", data.room_id);
             window.location.href = `/chat/${data.room_id}`;
         } else {
             alert(data.message);
@@ -90,11 +202,11 @@ function createRoom() {
     });
 }
 
-function joinRoom() {
-    const username = document.getElementById('username').value;
+function joinRoom(userID) {
+    // const username = document.getElementById('username').value;
     const roomID_Name = document.getElementById('roomID_Name').value;
     
-    if (!username || !roomID_Name) {
+    if (!userID || !roomID_Name) {
         alert('Please enter both username and room code');
         return;
     }
@@ -105,7 +217,7 @@ function joinRoom() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            username: username,
+            user_id: userID,
             roomID: roomID_Name
         })
     })
@@ -127,7 +239,7 @@ function sendMessage() {
     
     socket.emit('message', {
         room_id: ROOM_ID,
-        username: USERNAME,
+        user_id: USER_ID,
         message: message
     });
     
@@ -137,10 +249,10 @@ function sendMessage() {
 function leaveRoom() {
     socket.emit('leave', {
         room: ROOM_ID,
-        username: USERNAME
+        user_id: USER_ID
     });
 
-    window.location.href = '/';
+    window.location.href = `/rooms/${USER_ID}`;
 }
 
 function appendMessage(username, message, timestamp) {
@@ -181,9 +293,9 @@ function updateActiveUsers(users) {
         userElement.className = 'active-user';
         userElement.textContent = user;
         userList.appendChild(userElement);
-        console.log("user: ", user);
+        // console.log("user: ", user);
     });
-    console.log("users: ", users);
+    // console.log("users: ", users);
 }
 
 // fetch the last 50 messages from the server

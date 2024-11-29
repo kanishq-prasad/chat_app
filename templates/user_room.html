@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="room-container">
+    <div class="room-header">
+        <span>Logged in as: {{ username }}</span>
+    </div>
+    <div class="rooms" id="rooms">
+        <h2>Your Rooms</h2>
+        {% for room in rooms %}
+            <button onclick="openRoom('{{ room.room_id }}')">{{ room.room_name }}</button>
+        {% endfor %}
+    </div>
+    <div class="actions">
+        <button onclick="addRoom( '{{user_id}}' )">Join/Create Room</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+</div>
+<script>
+    const USER_ID = "{{ user_id }}";
+    // the variables USERNAME is declared in the <script>
+    // tag within the HTML template. They get their values from the
+    // server-side template rendering engine, which in this case appears
+    // to be Jinja2 (commonly used with Flask)
+</script>
+{% endblock %}
