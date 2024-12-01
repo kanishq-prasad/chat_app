@@ -37,6 +37,8 @@ def on_join(data):
     
     # Handle both in-memory and database operations
     room_manager.join_room(room, user_id)
+
+    username = UserRepository().get_username_by_id(user_id)
     
     with app.app_context():
         # Create or update room in database
@@ -66,12 +68,15 @@ def on_join(data):
             i += 1
     
     # Update active users list
-    active_users = room_manager.get_active_users(room)
+    active_users = list(room_manager.get_active_users(room))
+    for active_user in active_users:
+        active_user = int(active_user)
     # print("active users", active_users)
     active_usernames = UserRepository().get_usernames_by_ids(list(active_users))
+    # print("active usernames", active_usernames)
     socketio.emit('active_users', {'users': active_usernames}, room=room)
     
-    socketio.emit('status', {'msg': f'{user_id} has joined the room.'}, room=room)
+    socketio.emit('status', {'msg': f'{username} has joined the room.'}, room=room)
 
 @socketio.on('leave')
 def on_leave(data):

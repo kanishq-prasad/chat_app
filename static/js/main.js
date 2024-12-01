@@ -291,14 +291,14 @@ function appendStatusMessage(message) {
 function updateActiveUsers(users) {
     const userList = document.getElementById('activeUsers');
     if (userList) {
-        userList.innerHTML = '';
+        userList.innerHTML = 'Online Users: ';
     }
     Object.values(users).forEach(user => {
         const userElement = document.createElement('div');
         userElement.className = 'active-user';
-        userElement.textContent = user.username || user; // Adjust based on the structure of user object
+        userElement.textContent = user;
         userList.appendChild(userElement);
-        console.log("user: ", user.username || user);
+        console.log("user: ", user);
     });
 }
 

@@ -37,7 +37,8 @@ class UserRepository(BaseRepository):
             with safe_session() as session:
                 users = session.query(Users).filter(Users.id.in_(user_ids)).all()
                 user_dict = {user.id: user.username for user in users}
-                ordered_user_dict = {user_id: user_dict[user_id] for user_id in user_ids if user_id in user_dict}
+                # print(user_dict, "users in get_usernames_by_ids")
+                ordered_user_dict = {int(user_id): user_dict[int(user_id)] for user_id in user_ids if int(user_id) in user_dict}
                 return ordered_user_dict
         except Exception as e:
             logger.error("Error in getting users by ids: %s", e)

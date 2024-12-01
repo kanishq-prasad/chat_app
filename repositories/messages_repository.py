@@ -31,7 +31,7 @@ class MessagesRepository(Messages, BaseRepository):
     def get_message_detail_by_id(self, message_id):
         try:
             with safe_session() as session:
-                message_details = session.query.with_entities(self.chat_id, self.message, self.sent_at, self.edited_at).filter_by(id=message_id).first()
+                message_details = session.query(Messages).with_entities(Messages.chat_id, Messages.message, Messages.sent_at, Messages.edited_at).filter_by(id=message_id).first()
                 return message_details
         except Exception as e:
             logger.error("Error in getting message details by id: %s", e)
