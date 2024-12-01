@@ -14,28 +14,19 @@ class MessagesRepository(Messages, BaseRepository):
     
     def create_new_message(self, data):
         new_message = Messages(
-            chat_id=data.chat_id,
-            sender_id=data.sender_id,
-            message=data.message,
-            is_edited=data.is_edited,
-            sent_at=data.sent_at,
+            room_id=data.get('room_id'),
+            user_id=data.get('user_id'),
+            content=data.get('content')
         )
 
         try:
-            self.save_in_db(new_message)
-            return new_message.id
+            with safe_session() as session:
+                session.add(new_message)
+                session.commit()
+                return new_message.id, new_message.created_at
         except Exception as e:
             logger.error("Error in saving message to db: %s", e)
             return False
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'room_code': self.room_code,
-            'username': self.username,
-            'content': self.content,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
-        }
     
     def get_message_detail_by_id(self, message_id):
         try:

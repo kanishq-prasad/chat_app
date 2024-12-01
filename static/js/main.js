@@ -9,10 +9,11 @@ if (window.location.pathname.includes('/chat/')) {
             room: ROOM_ID,
             user_id: USER_ID
         }); // the value of ROOM_ID and USERNAME are embeded in chat.html
-        fetchMessages(ROOM_ID);
+        fetchMessages(USER_ID, ROOM_ID);
     });
     
     socket.on('message', (data) => {
+        console.log('Message received:', data);
         appendMessage(data.username, data.message);
     });
     
@@ -149,14 +150,16 @@ function setupAxiosInterceptors() {
     );
 }
 
-function openRoom(roomID) {
+function openRoom(user_id, roomID) {
     
-    if (!roomID) {
+    if (!roomID || !user_id) {
         alert('Invalid room code');
         return;
     }
+
+    // console.log("roomID: ", roomID);
     
-    window.location.href = `/chat/${roomID}`;
+    window.location.href = `/chat/${user_id}/${roomID}`;
 }
 
 function addRoom(userID){
@@ -195,7 +198,7 @@ function createRoom(userID) {
     .then(data => {
         if (data.success) {
             // console.log("data.room_id: ", data.room_id);
-            window.location.href = `/chat/${data.room_id}`;
+            window.location.href = `/chat/${data.user_id}/${data.room_id}`;
         } else {
             alert(data.message);
         }
@@ -218,13 +221,13 @@ function joinRoom(userID) {
         },
         body: JSON.stringify({
             user_id: userID,
-            roomID: roomID_Name
+            room_id: roomID_Name
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = `/chat/${data.room_id}`;
+            window.location.href = `/chat/${data.user_id}/${data.room_id}`;
         } else {
             alert(data.message);
         }
@@ -242,6 +245,8 @@ function sendMessage() {
         user_id: USER_ID,
         message: message
     });
+
+    // console.log("message: ", message, "ROOM_ID: ", ROOM_ID, "USER_ID: ", USER_ID);
     
     messageInput.value = '';
 }
@@ -288,19 +293,18 @@ function updateActiveUsers(users) {
     if (userList) {
         userList.innerHTML = '';
     }
-    users.forEach(user => {
+    Object.values(users).forEach(user => {
         const userElement = document.createElement('div');
         userElement.className = 'active-user';
-        userElement.textContent = user;
+        userElement.textContent = user.username || user; // Adjust based on the structure of user object
         userList.appendChild(userElement);
-        // console.log("user: ", user);
+        console.log("user: ", user.username || user);
     });
-    // console.log("users: ", users);
 }
 
 // fetch the last 50 messages from the server
-async function fetchMessages(room_id) {
-    const response = await fetch(`/chat/${room_id}`);
+async function fetchMessages(user_id, room_id) {
+    const response = await fetch(`/chat/${user_id}/${room_id}`);
     const messages = await response.json();
     const messagesList = document.getElementById('messages');
     messagesList.innerHTML = '';

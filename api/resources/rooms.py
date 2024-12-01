@@ -5,8 +5,10 @@ from repositories.room_repository import RoomRepository
 
 class Rooms(Resource):
     def join(self, data):
-        room_id = data['roomID']
-        user_id = data['user_id']
+        room_id = data.get('room_id')
+        user_id = data.get('user_id')
+
+        # print(room_id, user_id, "room_id and user_id in join method")
         
         existing_room = RoomRepository().check_room_exists(room_id)
         if not existing_room:

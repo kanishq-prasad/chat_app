@@ -6,6 +6,7 @@ from database.db import db
 from datetime import datetime
 from models.rooms import Rooms
 from repositories.user_repository import UserRepository
+from repositories.messages_repository import MessagesRepository
 from models.messages import Messages
 from models.room_manager import RoomManager
 
@@ -99,12 +100,13 @@ def handle_message(data):
     
     # Save message to database
     with app.app_context():
-        message = Messages(
-            room_id=room_id,
-            user_id=user_id,
-            content=message_content
-        )
-        db.session.add(message)
+        message_data = {
+            'room_id': room_id,
+            'user_id': user_id,
+            'content': message_content
+        }
+
+        message_id, created_at = MessagesRepository().create_new_message(message_data)
         
         # Update room's last activity
         room_obj = Rooms.query.filter_by(id=room_id).first()
@@ -119,7 +121,7 @@ def handle_message(data):
         socketio.emit('message', {
             'username': username,
             'message': message_content,
-            'timestamp': message.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            'timestamp': created_at.strftime('%Y-%m-%d %H:%M:%S')
         }, room=room_id)
 
 if __name__ == '__main__':

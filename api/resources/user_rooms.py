@@ -12,4 +12,4 @@ class UserRooms(Resource):
 
         if not room_id:
             return jsonify({'success': False, 'message': 'Error creating user room'})
-        return jsonify({'success': True, 'room_id': user_room_id})
+        return jsonify({'success': True, 'user_id': user_id, 'room_id': user_room_id})

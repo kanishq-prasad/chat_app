@@ -7,7 +7,7 @@
     <div class="rooms" id="rooms">
         <h2>Your Rooms</h2>
         {% for room in rooms %}
-            <button onclick="openRoom('{{ room.room_id }}')">{{ room.room_name }}</button>
+            <button onclick="openRoom('{{user_id}}', '{{ room.room_id }}')">{{ room.room_name }}</button>
         {% endfor %}
     </div>
     <div class="actions">

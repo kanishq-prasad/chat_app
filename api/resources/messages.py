@@ -1,6 +1,8 @@
 from flask_restful import Resource, request
 from flask import jsonify, session
 from repositories.messages_repository import MessagesRepository
+from repositories.room_repository import RoomRepository
+from database.db import db
 
 
 class Messages(Resource):
@@ -16,10 +18,6 @@ class Messages(Resource):
         data = request.json
         message = data.get('message')
         username = session.get('username')
-        
-        room = RoomRepository().get_detail_by_id(room_id)
-        if not room:
-            return jsonify({'success': False, 'message': 'Room does not exist'})
         
         new_message = Messages(room_id=room_id, user=username, message=message)
         db.session.add(new_message)

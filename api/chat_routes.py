@@ -123,6 +123,7 @@ def create_room():
 # @token_required
 def join_room():
     data = request.json
+    # print(data, "data in join_room, chat_routes")
     response = Rooms().join(data).json
     print(response.get('success'), "response in join_room")
     if response.get('success'):
@@ -131,16 +132,21 @@ def join_room():
     else:
         return response
 
-@chat_bp.route('/chat/<room_id>')
+@chat_bp.route('/chat/<user_id>/<room_id>')
 # @token_required
-def chat(room_id):
-    if 'user_id' not in session:
-        return redirect('/')
+def chat(user_id, room_id):
+
+    data = {
+        'room_id': room_id,
+        'user_id': user_id
+    }
+
+    Rooms().join(data)
     
-    print(room_id, "room_id in chat route")
+    # print(user_id, room_id, "user_id and room_id in chat route")
     
     room_name = Rooms().get(room_id)
-    username = UserRepository().get_username_by_id(session.get('user_id'))
+    username = UserRepository().get_username_by_id(user_id)
     if not room_name:
         return redirect('/')
     
